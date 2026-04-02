@@ -11,7 +11,8 @@
 # Use R documentation for understanding 
 
 ## Objects, Vectors, and Matrices
-## Q1: Objects
+
+## Q1-1: Objects
 # a-d: creating objects
 Harry <- 50; Harry
 Hermione <- 47; Hermione
@@ -32,7 +33,7 @@ Voldemort <- 1 / Harry; Voldemort
 # Answer shld be 1
 Voldemort * Harry
 
-## Q2: Calculations
+## Q1-2: Calculations
 # Note: Order of operations is key
 # a-h
 7546 + 9918
@@ -43,7 +44,7 @@ Voldemort * Harry
 74 ^ 2
 999 %% 77 # Modulo
 
-## Q3: (Atomic) Vectors
+## Q1-3: (Atomic) Vectors
 # a-c: Creating 2 vectors wizards1 and wizards2, then create longer vector with
 # wizards 2 at the end of wizards2 
 # Think of c() as concate or combine elements/objects etc.
@@ -69,7 +70,7 @@ wizards[2:4] # Colon to specify range
 # Results shld be series of non-numbers
 wizards < 45
 
-## Q4: Matrices
+## Q1-4: Matrices
 # a: Create vector named scores
 scores <- c(75, 49, 68, 83, 97, 91, 98, 89, 91); scores 
 
@@ -113,3 +114,42 @@ allwiz_sub["Neville", "test3"] <- 98; allwiz_sub # alternatively, allwiz_sub[4, 
 allwiz_sub[ , "newavg"] <- rowMeans(subset(allwiz_sub, select = c("test1", "test3"))); allwiz_sub
 colnames(allwiz_sub)[3] <- "finalavg"; colnames(allwiz_sub)
 allwiz_sub
+
+## Factors, Data Frames, and Lists
+
+## Q2-1: Characters and Factors
+# a-b: Create obj label truth and takes a string value, check class
+truth <- "Dartmouth is, like, way better than all the other schools. Like, it’s not even close, you guys."
+truth; class(truth)
+
+# c: Create vector called colors
+colors <- c("red", "blue", "green", "red", "blue"); colors
+
+# d: Create factor vector called factor_colors from colors vector
+factor_colors <- factor(colors); factor_colors
+
+# e: Create factor2_colors and set arg levels to red and blue
+factor2_colors <- factor(colors, levels = c("red", "blue")); factor2_colors
+# comparing the two vectors, we can see that the element green is substituted with NA
+# the levels argument within factors defines the allowed categorical values to be included in the analysis
+# it can also be used for custom sorting of categorical values
+
+# f: Report summaries of colors, factor_colors, and factor2_colors using summary function
+summary(colors)
+summary(factor_colors)
+summary(factor2_colors)
+
+# g: Create vector called ideology that take 10 values
+ideology <- c("liberal", "conservative", "very liberal", "very conservative", "middle of the road", 
+              "slightly conservative","slightly liberal", "liberal", "conservative", "middle of the road")
+ideology
+
+# h: Create factor called fact_ideo and order levels
+fact_ideo <- factor(ideology, levels = c("very liberal", "liberal", "slightly liberal", "middle of the road", 
+                                         "slightly conservative", "conservative", "very conservative"))
+fact_ideo
+
+# i: Create char vector labeled respondents taking in 10 value
+respondents <- c("Susie", "Abdul", "Maria", "Fred", "Wilma", "Barney", "Dino", "Ajax", "Thor", "Betty"); respondents
+
+
