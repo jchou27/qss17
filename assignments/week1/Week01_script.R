@@ -99,7 +99,7 @@ otherwiz
 all_wiz_scores <- rbind(wiz_scores2, otherwiz); all_wiz_scores
 
 # g: Extract Hermione's 2nd and 3rd scores using matrix subsetting operator
-print(all_wiz_scores["Hermione", c("test2", "test3")])
+all_wiz_scores["Hermione", c("test2", "test3")]
 # alternatively, all_wiz_scores[3, 2:3])
 
 # h: create allwiz_sub and delete test 2 from matrix, recalc avg and replace avg col with newavg
@@ -152,4 +152,27 @@ fact_ideo
 # i: Create char vector labeled respondents taking in 10 value
 respondents <- c("Susie", "Abdul", "Maria", "Fred", "Wilma", "Barney", "Dino", "Ajax", "Thor", "Betty"); respondents
 
+## Q2-2 Data Frames
+# a: Create vector called income that take in numerical val
+income <- c(100000, 75000, 48000, 62000, 31000, 52500, 274000, 88000, 21000, 74000); income
 
+# b: Create data frame called data1 from respondents, ideology, and income
+data1 <- data.frame(respondents, ideology,income); data1
+
+# c: show head of data1
+head(data1, n = 3 )
+
+# d: show tail of data1
+tail(data1, n = 3)
+
+# e: show structure of data1
+str(data1)
+
+# f: Order observations in dataset by income in desc, make new copy named orderdat
+orderdat <- data1[order(data1$income, decreasing = TRUE), ] # space at the end to return all columns
+orderdat
+
+# g: extract data1 with lowest income, subset/iso entire row, pull and print
+data1[which.min(data1$income), ] # which.min returns index of 1st occurrence of min value
+
+# h: Select data1 the names of all respondents starting with Fred and ending with Ajax
