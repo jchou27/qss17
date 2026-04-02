@@ -127,11 +127,16 @@ colors <- c("red", "blue", "green", "red", "blue"); colors
 
 # d: Create factor vector called factor_colors from colors vector
 factor_colors <- factor(colors); factor_colors
+table(factor_colors)
+levels(factor_colors)
 
 # e: Create factor2_colors and set arg levels to red and blue
 factor2_colors <- factor(colors, levels = c("red", "blue")); factor2_colors
+table(factor2_colors)
+levels(factor2_colors)
 # comparing the two vectors, we can see that the element green is substituted with NA
 # the levels argument within factors defines the allowed categorical values to be included in the analysis
+# if levels is not specified, R auto assigns levels based on unique values present in the input vector
 # it can also be used for custom sorting of categorical values
 
 # f: Report summaries of colors, factor_colors, and factor2_colors using summary function
@@ -146,8 +151,10 @@ ideology
 
 # h: Create factor called fact_ideo and order levels
 fact_ideo <- factor(ideology, levels = c("very liberal", "liberal", "slightly liberal", "middle of the road", 
-                                         "slightly conservative", "conservative", "very conservative"))
+                                         "slightly conservative", "conservative", "very conservative"), ordered = TRUE)
 fact_ideo
+table(fact_ideo)
+levels(fact_ideo)
 
 # i: Create char vector labeled respondents taking in 10 value
 respondents <- c("Susie", "Abdul", "Maria", "Fred", "Wilma", "Barney", "Dino", "Ajax", "Thor", "Betty"); respondents
@@ -157,7 +164,7 @@ respondents <- c("Susie", "Abdul", "Maria", "Fred", "Wilma", "Barney", "Dino", "
 income <- c(100000, 75000, 48000, 62000, 31000, 52500, 274000, 88000, 21000, 74000); income
 
 # b: Create data frame called data1 from respondents, ideology, and income
-data1 <- data.frame(respondents, ideology,income); data1
+data1 <- data.frame(respondents, ideology, income); data1
 
 # c: show head of data1
 head(data1, n = 3 )
@@ -169,10 +176,15 @@ tail(data1, n = 3)
 str(data1)
 
 # f: Order observations in dataset by income in desc, make new copy named orderdat
-orderdat <- data1[order(data1$income, decreasing = TRUE), ] # space at the end to return all columns
-orderdat
+orderdat <- data1[order(data1$income, decreasing = TRUE), ]; orderdat # space at the end to return all columns
+
+data1 # Show original has not changed
 
 # g: extract data1 with lowest income, subset/iso entire row, pull and print
 data1[which.min(data1$income), ] # which.min returns index of 1st occurrence of min value
 
 # h: Select data1 the names of all respondents starting with Fred and ending with Ajax
+data1$respondents[4:8]
+
+# i: Add new var called log_income to data1, which take natural log of income var to find large outlier
+data1$log_income <- log(data1$income); data1
