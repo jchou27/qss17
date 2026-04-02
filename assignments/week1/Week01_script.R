@@ -6,7 +6,7 @@
 
 ## Assignment Notes:
 # Write comments
-# Use TRUE/FALSE as synonyms
+# Use TRUE/FALSE as synonyms, not T/F
 # When creating object, print object after creation
 # Use R documentation for understanding 
 
