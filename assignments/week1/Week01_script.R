@@ -243,11 +243,11 @@ income <- c(100000, 75000, 48000, 62000, 31000, 52500, 274000, 88000, 21000, 740
 # Column names default to the names of the input vectors
 data1 <- data.frame(respondents, ideology, income); data1
 
-# c: Inspect the first 3 rows of data1 using head()
+# c: Inspect the first rows of data1 using head()
 # head() defaults to 6 rows
 head(data1)
 
-# d: Inspect the last 3 rows of data1 using tail()
+# d: Inspect the last rows of data1 using tail()
 # tail() mirrors head() but reads from the bottom of the data frame
 tail(data1)
 
