@@ -197,4 +197,16 @@ survey <- list(ideology, respondents, income); survey
 session <- 2
 
 # c: Create an object weeks that is a 3x3 matrix num 1-9
-weeks <- matrix(1:9, byrow = TRUE); weeks
+weeks <- matrix(1:9, nrow = 3, ncol = 3, byrow = TRUE); weeks
+
+# d: Create dv_list that takes truth, session, weeks, data1, survey and rename
+dv_list <- list(truth, session, weeks, data1, survey); dv_list
+names(dv_list) <- c("truth", "sess1", "wk", "dat", "svy"); names(dv_list)
+
+# e: Extract middle element from the weeks matrix from dv_list
+dv_list$wk[2, 2] # Or dv_list[["wk"]][2, 2]
+
+
+# f: Change income var in data1 from within dv_list. Divide income by 2.
+dv_list$dat["income"] <- dv_list$dat["income"] / 2
+dv_list$dat
