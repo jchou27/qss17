@@ -105,7 +105,7 @@ wizards["Ginny"]
 wizards[c("Hermione", "Ron")]
 
 # i: Extract elements 2 through 4 using a positional range
-# The colon operator generates an integer sequence: 2:4 = c(2, 3, 4)
+# The colon operator generates an integer sequence
 wizards[2:4]
 
 # j: Use a logical comparison to show which wizards scored below 45
@@ -162,11 +162,7 @@ all_wiz_scores["Hermione", c("test2", "test3")]
 # Alternative using positional indexing: all_wiz_scores[3, 2:3]
 
 # h: Build allwiz_sub by dropping test2 and avg columns from all_wiz_scores
-# subset() with negative select removes the named columns; remaining columns are kept
-# Alternative using bracket indexing:
-#   all_wiz_scores[, !colnames(all_wiz_scores) %in% c("test2", "avg")]
-allwiz_sub <- subset(all_wiz_scores, select = -test2); allwiz_sub
-allwiz_sub <- subset(allwiz_sub, select = -avg); allwiz_sub
+allwiz_sub <- all_wiz_scores[, !colnames(all_wiz_scores) %in% c("test2", "avg")]; allwiz_sub
 allwiz_sub <- cbind(allwiz_sub, rowMeans(allwiz_sub)); allwiz_sub
 colnames(allwiz_sub)[3] <- "newavg"; colnames(allwiz_sub)
 allwiz_sub
@@ -176,7 +172,7 @@ allwiz_sub
 # Alternative positional: allwiz_sub[4, 2]
 allwiz_sub["Neville", "test3"] <- 98; allwiz_sub
 # Step 2: newavg must be recalculated AFTER test3 changes. rowMeans on test1 and test3 only
-allwiz_sub[ , "newavg"] <- rowMeans(subset(allwiz_sub, select = c("test1", "test3"))); allwiz_sub
+allwiz_sub[, "newavg"] <- rowMeans(allwiz_sub[, c("test1", "test3")]); allwiz_sub
 # Step 3: rename the avg column to finalavg, which is just a colnames assignment
 colnames(allwiz_sub)[3] <- "finalavg"; colnames(allwiz_sub)
 allwiz_sub
