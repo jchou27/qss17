@@ -188,3 +188,13 @@ data1$respondents[4:8]
 
 # i: Add new var called log_income to data1, which take natural log of income var to find large outlier
 data1$log_income <- log(data1$income); data1
+
+## Q2-3: Lists
+# a: Take ideology, respondents, and income var, put them into list obj called survey
+survey <- list(ideology, respondents, income); survey
+
+#b: Create an obj session that take value 2
+session <- 2
+
+# c: Create an object weeks that is a 3x3 matrix num 1-9
+weeks <- matrix(1:9, byrow = TRUE); weeks
