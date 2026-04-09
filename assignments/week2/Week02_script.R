@@ -54,24 +54,24 @@ swiss %>%
 ## Note: Use read_csv(), optional to use file.choose() or file path
 movies <- read_csv("data/movie_metadata.csv")
 
-## 2b. Explore movie dataset via glimpse or str
+## 3b. Explore movie dataset via glimpse or str
 glimpse(movies)
 str(movies)
 
-## 2c. Add a new variable to dataset budget2 with the mutate function
+## 3c. Add a new variable to dataset budget2 with the mutate function
 ## and measure budget in millions of dollars
 movies <- movies %>%
   mutate(budget2 = budget / 10e6)
 
 glimpse(movies)
 
-## 2d. Add a length variable that is properly measured in hours
+## 3d. Add a length variable that is properly measured in hours
 movies <- movies %>%
   mutate(length = duration / 60)
 
 glimpse(movies)
 
-## 2e. Subset movie dataset from "Spectre" to "Skyfall"
+## 3e. Subset movie dataset from "Spectre" to "Skyfall"
 ## Note: Use the titles in movie_title to do this, not row col numbers
 ## str_which() = return instance where the pattern matches the string
 ## [1] = first instance
@@ -79,3 +79,5 @@ first_ind <- str_which(movies$movie_title, "Spectre"[1])
 sec_ind <- str_which(movies$movie_title, "Skyfall"[1])
 
 movies[first_ind:sec_ind, ]
+
+
