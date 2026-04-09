@@ -10,8 +10,8 @@
 library(tidyverse)
 
 ## 1b. Load swiss dataset with data command, look at head.
-# Data represents a few key socieconomic indicators of Switzerland
-# in the late 19th-century
+## Data represents a few key socieconomic indicators of Switzerland
+## in the late 19th-century
 data("swiss")
 head(swiss)
 
@@ -23,7 +23,7 @@ swiss_tibble <- as_tibble(swiss); swiss_tibble
 
 ## 1d. Filter dataset for provinces that have les than 50% male
 ## involvement in agriculture. Use pipe operator
-# Note: This does not change the original dataset, just filters
+## Note: This does not change the original dataset, just filters
 swiss %>%
   filter(Agriculture < 50.0)
 
@@ -80,4 +80,78 @@ sec_ind <- str_which(movies$movie_title, "Skyfall"[1])
 
 movies[first_ind:sec_ind, ]
 
+## Q4. Plots & ggplot2
 
+## 4a. Read WIID and call it undat or wiid.
+## Note: Need to install readxl package to use read_excel() function
+
+library(readxl)
+wiid <- read_excel("data/WIID_30JUN2022_0.xlsx")
+
+## 4b. show head, tail, and glimpse of dataset
+head(wiid)
+tail(wiid)
+glimpse(wiid)
+
+## 4c. filter dataset for just NA countries (include Mexico).
+## produce scatterplot of Gini coefficient over time (gini vs. year).
+## Map country onto color
+
+# To find the unique values for filtering
+unique(wiid$region_wb)
+unique(wiid$region_un_sub)
+unique(wiid$country)
+
+# Filter for NA countries
+wiid_na <- wiid %>%
+  filter(region_wb == "North America" | country == "Mexico")
+# Plotting
+ggplot(wiid_na, aes(x = year, y = gini, color = country)) +
+  geom_point()
+
+## 4d. Repeat the same problem but use a line plot instead and comment
+ggplot(wiid_na, aes(x = year, y = gini, color = country)) +
+  geom_line()
+# The lines are messy because the WIID dataset contains multiple Gini
+# observations, so geom_line() connects all of them, 
+# causing erratic zigzagging.
+
+## Q5. Basic statistics and summaries with summarize
+
+## 5a. Use pipe operator and summarize the gini index q1 and q5 with median
+wiid %>%
+  summarize(
+    median_gini = median(gini, na.rm = TRUE),
+    median_q1 = median(q1, na.rm = TRUE),
+    median_q5 = median(q5, na.rm = TRUE)
+  )
+
+## 5b. For year 2000, find highest values for gini, d1, d10 for Africa
+wiid %>%
+  filter(str_detect(region_un_sub, "Africa"), year == 2000) %>%
+  summarize(
+    max_gini = max(gini, na.rm = TRUE),
+    max_q1 = max(q1, na.rm = TRUE),
+    max_q5 = max(q5, na.rm = TRUE)
+  )
+
+## 5c. Filter for United States in 2000, show Gini index val w/o summarize
+wiid %>%
+  filter(country == "United States", year == 2000) %>%
+  select(gini)
+# There are multiple Gini values for the US in 2000 because the WIID compiles
+# data from many different surveys and income definitions (gross vs. net,
+# household vs. per capita). Each row is a separate observation from a
+# different source.
+
+## 5d. Filter for African countries, report means, medians, SD of gini
+wiid %>%
+  filter(str_detect(region_un_sub, "Africa")) %>%
+  group_by(country) %>%
+  summarize(
+    mean_gini = mean(gini, na.rm = TRUE),
+    median_gini = median(gini, na.rm = TRUE),
+    sd_gini = sd(gini, na.rm = TRUE)
+  )
+
+  
