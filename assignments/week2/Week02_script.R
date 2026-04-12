@@ -12,7 +12,7 @@ library(tidyverse)
 ## 1b. Load swiss dataset with data command, look at head.
 ## Data represents a few key socioeconomic indicators of Switzerland
 ## in the late 19th-century
-data("swiss")
+data(swiss)
 head(swiss)
 
 # Question mark to see more info about data
@@ -179,7 +179,8 @@ wiid %>%
 ## Find the unique levels of region_un before converting to a factor
 unique(wiid$region_un)
 
-## Convert region_un to a factor column fact_region_un following the fact_ naming convention
+## Convert region_un to a factor column fact_region_un
+## Converted to factor since it is a catgorical variable needed in ggplot
 wiid <- wiid %>%
   mutate(fact_region_un = factor(region_un))
 
@@ -194,7 +195,7 @@ wiid %>%
   ungroup() %>%
   ggplot(aes(x = year, y = mean_gini, color = fact_region_un)) +
   geom_point() +
-  facet_wrap(~ fact_region_un) +
+  facet_wrap(~ fact_region_un, axes = "all") +
   labs(
     x = "Year",
     y = "Mean Gini Index",
@@ -230,7 +231,7 @@ wiid %>%
   ungroup() %>%
   ggplot(aes(x = year, y = median_gini, fill = fact_region_un)) +
   geom_col() +
-  facet_wrap(~ fact_region_un) +
+  facet_wrap(~ fact_region_un, axes = "all") +
   labs(
     x = "Year",
     y = "Median Gini Index",
@@ -279,8 +280,7 @@ wiid %>%
     y = "Income Share of Lowest Quintile (%)",
     title = "Lowest Quintile Income Share by UN Region"
   ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_minimal()
 
 ## 6g. Boxplots of Gini by income group, faceted by UN region
 ## factor() with explicit levels orders income groups from low to high income
