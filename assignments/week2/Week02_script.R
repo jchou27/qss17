@@ -73,13 +73,15 @@ movies <- movies %>%
 glimpse(movies)
 
 ## 3e. Subset movie dataset from "Spectre" to "Skyfall"
-## Note: Use the titles in movie_title to do this, not row col numbers
+## Note: Use the titles in movie_title to do this, not positional row numbers
 ## str_which() returns the row indices where the pattern matches
 ## [1] outside str_which() takes the first match, in case of multiple hits
+## slice() subsets rows by index in a tidyverse-consistent way
 first_ind <- str_which(movies$movie_title, "Spectre")[1]
 sec_ind <- str_which(movies$movie_title, "Skyfall")[1]
 
-movies[first_ind:sec_ind, ]
+movies %>% 
+  slice(first_ind:sec_ind)
 
 ## Q4: Plots & ggplot2
 
@@ -176,13 +178,8 @@ wiid %>%
 
 ## Q6: More Plots
 
-## Find the unique levels of region_un before converting to a factor
+## Find the unique levels of region_un
 unique(wiid$region_un)
-
-## Convert region_un to a factor column fact_region_un
-## Converted to factor since it is a catgorical variable needed in ggplot
-wiid <- wiid %>%
-  mutate(fact_region_un = factor(region_un))
 
 glimpse(wiid)
 
@@ -190,28 +187,28 @@ glimpse(wiid)
 ## facet_wrap() creates one panel per region within one plot environment
 ## ungroup() removes the grouping structure after summarize
 wiid %>%
-  group_by(fact_region_un, year) %>%
+  group_by(region_un, year) %>%
   summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
   ungroup() %>%
-  ggplot(aes(x = year, y = mean_gini, color = fact_region_un)) +
+  ggplot(aes(x = year, y = mean_gini)) +
   geom_point() +
-  facet_wrap(~ fact_region_un, axes = "all") +
+  facet_wrap(~ region_un, axes = "all") +
   labs(
     x = "Year",
     y = "Mean Gini Index",
-    title = "Mean Gini Index by UN Region Over Time",
-    color = "UN Region"
+    title = "Mean Gini Index by UN Region Over Time"
   ) +
   theme_minimal()
 
 ## 6b. Group the WIID data by OECD status and year, scatter plots of median Gini
-## color = factor(oecd) maps OECD membership onto color so both groups appear on
+## color = oecd maps OECD membership onto color so both groups appear on
 ## the same plot. geom_smooth() adds a smoother trend line per group
+
 wiid %>%
   group_by(oecd, year) %>%
   summarize(median_gini = median(gini, na.rm = TRUE)) %>%
   ungroup() %>%
-  ggplot(aes(x = year, y = median_gini, color = factor(oecd))) +
+  ggplot(aes(x = year, y = median_gini, color = oecd)) +
   geom_point() +
   geom_smooth() +
   labs(
@@ -223,15 +220,15 @@ wiid %>%
   theme_minimal()
 
 ## 6c. Bar plot of median Gini by UN region and year, filtered to post-1945
-## fill = fact_region_un maps region to bar color. facet_wrap separates by region
+## fill = region_un maps region to bar color. facet_wrap separates by region
 wiid %>%
   filter(year > 1945) %>%
-  group_by(fact_region_un, year) %>%
+  group_by(region_un, year) %>%
   summarize(median_gini = median(gini, na.rm = TRUE)) %>%
   ungroup() %>%
-  ggplot(aes(x = year, y = median_gini, fill = fact_region_un)) +
+  ggplot(aes(x = year, y = median_gini, fill = region_un)) +
   geom_col() +
-  facet_wrap(~ fact_region_un, axes = "all") +
+  facet_wrap(~ region_un, axes = "all") +
   labs(
     x = "Year",
     y = "Median Gini Index",
@@ -244,7 +241,7 @@ wiid %>%
 ## fill colors bar interiors (tied to variable = aesthetic)
 ## color would only outline the bars, not fill them
 wiid %>%
-  ggplot(aes(x = d10, fill = fact_region_un)) +
+  ggplot(aes(x = d10, fill = region_un)) +
   geom_histogram() +
   labs(
     x = "Income Share of Top Decile (%)",
@@ -259,7 +256,7 @@ wiid %>%
 ## position = "identity" makes bars overlap instead of stack (the default)
 ## alpha = 0.6 adds transparency so overlapping bars from different regions remain visible
 wiid %>%
-  ggplot(aes(x = d10, fill = fact_region_un, y = after_stat(density))) +
+  ggplot(aes(x = d10, fill = region_un, y = after_stat(density))) +
   geom_histogram(position = "identity", alpha = 0.6) +
   labs(
     x = "Income Share of Top Decile (%)",
@@ -271,9 +268,8 @@ wiid %>%
 
 ## 6f. Boxplots of lowest quintile income share (q1) split by UN region
 ## q1 = percent of national income held by the bottom 20% of the population
-## angle = 45 rotates x-axis labels so they don't overlap
 wiid %>%
-  ggplot(aes(x = fact_region_un, y = q1)) +
+  ggplot(aes(x = region_un, y = q1)) +
   geom_boxplot() +
   labs(
     x = "UN Region",
@@ -285,18 +281,20 @@ wiid %>%
 ## 6g. Boxplots of Gini by income group, faceted by UN region
 ## factor() with explicit levels orders income groups from low to high income
 ## Transformation is kept inside the pipe so wiid is not permanently overwritten
-## coord_flip() rotates axes so income group labels are readable without overlap
+## angle = 45 rotates x-axis labels so income group names are readable without overlap
+## hjust = 1 so they are right aligned
 wiid %>%
   mutate(incomegroup = factor(incomegroup,
     levels = c("Low income", "Lower middle income",
                "Upper middle income", "High income"), ordered = TRUE)) %>%
   ggplot(aes(x = incomegroup, y = gini)) +
   geom_boxplot() +
-  facet_wrap(~ fact_region_un) +
-  coord_flip() +
+  facet_wrap(~ region_un, axes = "all") +
   labs(
     x = "Income Group",
     y = "Gini Index",
     title = "Gini Scores by Income Group and UN Region"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
