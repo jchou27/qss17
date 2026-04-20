@@ -82,7 +82,8 @@ approve_long
 approve_long %>%
   ggplot(aes(x = year_qrt, y = value, color = type)) +
   geom_line(linewidth = 0.75) +
-  scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7")) +
+  scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7"),
+                     labels = c("econapp" = "Economic Approval", "fpapp" = "Foreign Policy Approval")) +
   labs(title = "Presidential Approval Ratings Over Time (1977-2002)",
        x = "Year", y = "Approval Rating", color = "Type")
 
@@ -93,7 +94,8 @@ approve_long %>%
   ggplot(aes(x = year_qrt, y = value, color = type)) +
   geom_point(alpha = 0.4) +
   geom_smooth() +
-  scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7")) +
+  scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7"),
+                     labels = c("econapp" = "Economic Approval", "fpapp" = "Foreign Policy Approval")) +
   labs(title = "Presidential Approval Ratings Over Time (1977-2002)",
        x = "Year", y = "Approval Rating", color = "Type")
 
@@ -106,7 +108,8 @@ econ_long
 econ_long %>%
   ggplot(aes(x = year_qrt, y = value, color = type)) +
   geom_line(linewidth = 0.75) +
-  scale_color_manual(values = c("qrtinfl" = "#c0392b", "qrtunem" = "#2e86c1")) +
+  scale_color_manual(values = c("qrtinfl" = "#c0392b", "qrtunem" = "#2e86c1"),
+                     labels = c("qrtinfl" = "Quarterly Inflation", "qrtunem" = "Quarterly Unemployment")) +
   scale_y_continuous(labels = scales::label_number(suffix = "%")) +
   labs(title = "Quarterly Inflation and Unemployment Over Time (1977-2002)",
        x = "Year", y = "Percentage", color = "Type")
