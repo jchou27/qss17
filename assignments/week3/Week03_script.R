@@ -114,3 +114,42 @@ econ_long %>%
   labs(title = "Quarterly Inflation and Unemployment Over Time (1977-2002)",
        x = "Year", y = "Percentage", color = "Type")
 
+## Q3: Open up the WIID dataset, look at head and tail
+library(readxl)
+
+wiid <- read_excel("data/WIID_30JUN2022_0.xlsx")
+wiid
+head(wiid)
+tail(wiid)
+glimpse(wiid)
+
+## Q3-a: Create a comparison between countries that is NOT a bar plot.
+## Plot avg GINI index values as points for 5 countries: GER, FRA, ITA, SPA, NOR
+## Add labels to the points that says names of countries
+## Make sure labels do not overlap with the points
+wiid %>%
+  filter(country %in% c("Germany", "France", "Italy", "Spain", "Norway"),
+         year == 2000) %>%
+  group_by(country) %>%
+  summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
+  ggplot(aes(x = country, y = mean_gini)) +
+  geom_point() +
+  geom_text(aes(label = country), nudge_y = 0.2, size = 3) +
+  labs(x = "", y = "Average GINI Index Value", title = "Average GINI Index Value Across 5 Countries") +
+  theme(axis.text.x = element_blank())
+
+## Q3-b: Density plot of Gini by UN subregion for Africa
+wiid %>%
+  filter(region_un == "Africa", !is.na(gini)) %>%
+  ggplot(aes(x = gini, fill = region_un_sub)) +
+  geom_density(alpha = 0.25) +
+  scale_fill_manual(values = colorRampPalette(c("#1a5276", "#e67e22"))(5)) +
+  labs(
+    title = "Income Inequality in Africa",
+    x     = "Gini Index",
+    y     = "Density",
+    fill  = "Subregion"
+  )
+
+glimpse(wiid)
+         
