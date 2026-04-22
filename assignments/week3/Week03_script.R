@@ -47,8 +47,7 @@ movie %>%
   facet_wrap(~ color, ncol = 1) +
   scale_fill_manual(values = c("#6b6b6b", "#c97d4e")) +
   labs(x = "IMDB Score", y = "Density", title = "IMDB Score Distribution by Film Color") +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5))
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
 
 ## Q2 Load data set calling approve. Look at head and tail
 approve <- read.csv("data/approval_data.csv")
