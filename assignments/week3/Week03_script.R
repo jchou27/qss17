@@ -20,12 +20,15 @@ tail(movie)
 ## Q1-b: IMDB scores differ between color and black and white movies.
 ## Show in jittered scatter plot with either geom_jitter or position = "jitter"
 ## Remove NA
+
+# First plot intentionally left with NA to demonstrate the problem the PDF flags.
 movie %>%
   ggplot(aes(x = color, y = imdb_score)) +
   geom_jitter() +
   labs(title = "IMDB Score by Color", x = "", y = "IMDB Score")
 
-
+# filter catches both R's NA type and empty strings (""), both of which appear in
+# this dataset's color column.
 movie %>%
   filter(!is.na(color), color != "") %>%
   ggplot(aes(x = color, y = imdb_score)) +
@@ -36,13 +39,19 @@ movie %>%
 ## with a fill aesthetic.
 ## Note: could use after_stat but used ..density.. to be more accurate to hw instruction
 
+# ..density.. normalizes the y-axis so both groups are comparable even though color
+# films vastly outnumber B&W films — area under each bar sums to 1.
+# facet_wrap with ncol = 1 stacks both panels vertically so the x-axes align for direct comparison.
+# legend.position = "none": the fill is already described by the facet strip label.
+# hjust = 0.5 centers the title as required.
+
 movie %>%
   filter(!is.na(color), color != "") %>%
   ggplot(aes(x = imdb_score, fill = color)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.5) +
   facet_wrap(~color, ncol = 1) +
   scale_fill_manual(values = c("#6b6b6b", "#c97d4e")) +
-  labs(title = "IMDB Score Distribution by Film Color", x = "IMDB Score", 
+  labs(title = "IMDB Score Distribution by Film Color", x = "IMDB Score",
        y = "Density") +
   theme_minimal() +
   theme(legend.position = "none",
@@ -59,12 +68,20 @@ tail(approve)
 glimpse(approve)
 
 ## 2-a (i) make a quick line plot of year on the x-axis and approve on the y-axis
+
+# year is an integer so each year maps to one x position, but there are 4 quarterly
+# observations per year.
+
 approve %>%
   ggplot(aes(x = year, y = approve)) +
   geom_line() +
   labs(title = "Presidential Approval Ratings Over Time (1977-2002)", x = "Year", y = "Approval Rating")
 
 ## 2-a (ii) Make a new variable combining year and qrt into one year-quarter variable
+
+# year + (qrt - 1) / 4 converts the quarter into a fractional year offset: Q1 adds
+# 0.00, Q2 adds 0.25, Q3 adds 0.50, Q4 adds 0.75, producing evenly-spaced numeric time points
+
 approve <- approve %>%
   mutate(year_qrt = year + (qrt - 1) / 4)
 approve
@@ -73,6 +90,11 @@ glimpse(approve)
   
 ## 2-a (iii) Subset to time variable, econapp, and fpapp
 ## 2-a (iv) Pivot to long form with type and value columns
+
+# pivot_longer collapses the two separate approval columns into one type column and one value column. 
+# ggplot's color aesthetic requires a single grouping column, so wide form cannot be mapped to a color aesthetic
+# long form makes it possible.
+
 approve_long <- approve %>%
   select(year_qrt, econapp, fpapp) %>%
   pivot_longer(cols = c(econapp, fpapp), names_to = "type", values_to = "value")
@@ -132,10 +154,11 @@ wiid %>%
          year == 2000) %>%
   group_by(country) %>%
   summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
+  ungroup() %>%
   ggplot(aes(x = country, y = mean_gini)) +
   geom_point() +
   geom_text(aes(label = country), nudge_y = 0.2, size = 3) +
-  labs(x = "", y = "Average GINI Index Value", title = "Average GINI Index Value Across 5 Countries") +
+  labs(x = "", y = "Average Gini Index", title = "Average GINI Index Value Across 5 Countries") +
   theme(axis.text.x = element_blank())
 
 ## Q3-b: Density plot of Gini by UN subregion for Africa
@@ -152,4 +175,77 @@ wiid %>%
   )
 
 glimpse(wiid)
-         
+
+## Q3-c: Bar plot of difference from Africa's average Gini per country
+africa_avg <- wiid %>%
+  filter(region_un == "Africa", !is.na(gini)) %>%
+  summarize(continent_avg = mean(gini, na.rm = TRUE)) %>%
+  pull(continent_avg)
+
+wiid %>%
+  filter(region_un == "Africa", !is.na(gini)) %>%
+  group_by(country) %>%
+  summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(diff = mean_gini - africa_avg) %>%
+  ggplot(aes(x = reorder(country, diff), y = diff)) +
+  geom_col(fill = "#2e7d8c") +
+  coord_flip() +
+  labs(
+    title = "Deviation from Africa's Average Gini Index",
+    x     = "",
+    y     = "Difference from Continental Average"
+  )
+
+## Q3-d: Point plot of mean Gini by country for Europe, flipped and reordered
+wiid %>%
+  filter(region_un == "Europe", !is.na(gini)) %>%
+  group_by(country) %>%
+  summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(aes(x = reorder(country, mean_gini), y = mean_gini)) +
+  geom_point() +
+  coord_flip() +
+  labs(
+    title = "Mean Gini Index by European Country",
+    x     = "",
+    y     = "Mean Gini Index"
+  ) +
+  theme(axis.text.y = element_text(size = 6))
+
+## Q3-e: Median Gini by year for Americas subregions with overall gray smoother
+americas_sub <- wiid %>%
+  filter(region_un == "Americas", !is.na(gini)) %>%
+  group_by(region_un_sub, year) %>%
+  summarize(median_gini = median(gini, na.rm = TRUE), .groups = "drop")
+americas_sub
+
+americas_sub %>%
+  ggplot(aes(x = year, y = median_gini, color = region_un_sub)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  geom_smooth(aes(group = 1), color = "#d3d3d3", se = FALSE) +
+  scale_color_manual(values = c("#e67e22", "#1a5276", "#27ae60", "#8e44ad")) +
+  labs(
+    title = "Median Gini Index by Year for Americas Subregions",
+    x     = "Year",
+    y     = "Median Gini Index",
+    color = "Subregion"
+  )
+
+## Q3-f: Dotplot of Gini by income group for Western Asia, with median summary
+wiid %>%
+  filter(region_un_sub == "Western Asia", !is.na(gini), !is.na(incomegroup)) %>%
+  ggplot(aes(x = incomegroup, y = gini)) +
+  geom_dotplot(
+    binaxis  = "y",
+    stackdir = "center",
+    alpha    = 0.6,
+    dotsize  = 0.5
+  ) +
+  stat_summary(fun = median, geom = "point", color = "#c0392b", size = 3) +
+  labs(
+    title = "Gini Index by Income Group in Western Asia",
+    x     = "Income Group",
+    y     = "Gini Index"
+  )
