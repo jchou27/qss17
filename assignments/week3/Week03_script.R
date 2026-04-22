@@ -204,10 +204,10 @@ wiid %>%
   filter(region_un_sub == "Western Asia", !is.na(gini), !is.na(incomegroup)) %>%
   ggplot(aes(x = incomegroup, y = gini)) +
   geom_dotplot(
-    binaxis  = "y",
+    binaxis = "y",
     stackdir = "center",
-    alpha    = 0.6,
-    dotsize  = 0.5
+    alpha = 0.6,
+    dotsize = 0.5
   ) +
   stat_summary(fun = median, geom = "point", color = "#c0392b", size = 3) +
   labs(x = "Income Group", y = "Gini Index", title = "Gini Index by Income Group in Western Asia")
