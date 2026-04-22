@@ -7,6 +7,7 @@
 
 library(tidyverse)
 
+# Set global default for every plot to have theme_minimal()
 theme_set(theme_minimal())
 
 ## Q1-a: Open IMDB and name movie. Check head tail.
@@ -25,7 +26,9 @@ tail(movie)
 movie %>%
   ggplot(aes(x = color, y = imdb_score)) +
   geom_jitter() +
-  labs(title = "IMDB Score by Color", x = "", y = "IMDB Score")
+  labs(
+    x = "", y = "IMDB Score", title = "IMDB Score by Color"
+  )
 
 # filter catches both R's NA type and empty strings (""), both of which appear in
 # this dataset's color column.
@@ -33,27 +36,23 @@ movie %>%
   filter(!is.na(color), color != "") %>%
   ggplot(aes(x = color, y = imdb_score)) +
   geom_jitter() +
-  labs(title = "IMDB Score by Color", x = "", y = "IMDB Score")
+  labs(
+    x = "", y = "IMDB Score", title = "IMDB Score by Color"
+  )
 
 ## Q1-c: plot same vars but make it into a histogram. Distinguish levels of color
 ## with a fill aesthetic.
 ## Note: could use after_stat but used ..density.. to be more accurate to hw instruction
 
-# ..density.. normalizes the y-axis so both groups are comparable even though color
-# films vastly outnumber B&W films — area under each bar sums to 1.
-# facet_wrap with ncol = 1 stacks both panels vertically so the x-axes align for direct comparison.
-# legend.position = "none": the fill is already described by the facet strip label.
-# hjust = 0.5 centers the title as required.
-
 movie %>%
   filter(!is.na(color), color != "") %>%
   ggplot(aes(x = imdb_score, fill = color)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.5) +
-  facet_wrap(~color, ncol = 1) +
+  facet_wrap(~ color, ncol = 1) +
   scale_fill_manual(values = c("#6b6b6b", "#c97d4e")) +
-  labs(title = "IMDB Score Distribution by Film Color", x = "IMDB Score",
-       y = "Density") +
-  theme_minimal() +
+  labs(
+    x = "IMDB Score", y = "Density", title = "IMDB Score Distribution by Film Color"
+  ) +
   theme(legend.position = "none",
         plot.title = element_text(hjust = 0.5))
 
@@ -69,18 +68,14 @@ glimpse(approve)
 
 ## 2-a (i) make a quick line plot of year on the x-axis and approve on the y-axis
 
-# year is an integer so each year maps to one x position, but there are 4 quarterly
-# observations per year.
-
 approve %>%
   ggplot(aes(x = year, y = approve)) +
   geom_line() +
-  labs(title = "Presidential Approval Ratings Over Time (1977-2002)", x = "Year", y = "Approval Rating")
+  labs(
+    x = "Year", y = "Approval Rating", title = "Presidential Approval Ratings Over Time (1977-2002)"
+  )
 
 ## 2-a (ii) Make a new variable combining year and qrt into one year-quarter variable
-
-# year + (qrt - 1) / 4 converts the quarter into a fractional year offset: Q1 adds
-# 0.00, Q2 adds 0.25, Q3 adds 0.50, Q4 adds 0.75, producing evenly-spaced numeric time points
 
 approve <- approve %>%
   mutate(year_qrt = year + (qrt - 1) / 4)
@@ -90,10 +85,7 @@ glimpse(approve)
   
 ## 2-a (iii) Subset to time variable, econapp, and fpapp
 ## 2-a (iv) Pivot to long form with type and value columns
-
-# pivot_longer collapses the two separate approval columns into one type column and one value column. 
-# ggplot's color aesthetic requires a single grouping column, so wide form cannot be mapped to a color aesthetic
-# long form makes it possible.
+## Did these 2 questions together
 
 approve_long <- approve %>%
   select(year_qrt, econapp, fpapp) %>%
@@ -106,8 +98,10 @@ approve_long %>%
   geom_line(linewidth = 0.75) +
   scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7"),
                      labels = c("econapp" = "Economic Approval", "fpapp" = "Foreign Policy Approval")) +
-  labs(title = "Presidential Approval Ratings Over Time (1977-2002)",
-       x = "Year", y = "Approval Rating", color = "Type")
+  labs(
+    x = "Year", y = "Approval Rating", title = "Presidential Approval Ratings Over Time (1977-2002)",
+    color = "Type"
+  )
 
 ## Q2-c: Plot same graph but as scatterplot with smoother line geom
 ## Make points more transparent than the smoother lines via alpha at 0.4
@@ -118,8 +112,10 @@ approve_long %>%
   geom_smooth() +
   scale_color_manual(values = c("econapp" = "#6aab80", "fpapp" = "#9b7fc7"),
                      labels = c("econapp" = "Economic Approval", "fpapp" = "Foreign Policy Approval")) +
-  labs(title = "Presidential Approval Ratings Over Time (1977-2002)",
-       x = "Year", y = "Approval Rating", color = "Type")
+  labs(
+    x = "Year", y = "Approval Rating", title = "Presidential Approval Ratings Over Time (1977-2002)",
+    color = "Type"
+  )
 
 ## Q2-d: Line plot of quarterly inflation and unemployment over time
 econ_long <- approve %>%
@@ -132,9 +128,10 @@ econ_long %>%
   geom_line(linewidth = 0.75) +
   scale_color_manual(values = c("qrtinfl" = "#c0392b", "qrtunem" = "#2e86c1"),
                      labels = c("qrtinfl" = "Quarterly Inflation", "qrtunem" = "Quarterly Unemployment")) +
-  scale_y_continuous(labels = scales::label_number(suffix = "%")) +
-  labs(title = "Quarterly Inflation and Unemployment Over Time (1977-2002)",
-       x = "Year", y = "Percentage", color = "Type")
+  labs(
+    x = "Year", y = "Percentage %", title = "Quarterly Inflation and Unemployment Over Time (1977-2002)",
+    color = "Type"
+  )
 
 ## Q3: Open up the WIID dataset, look at head and tail
 library(readxl)
@@ -151,14 +148,16 @@ glimpse(wiid)
 ## Make sure labels do not overlap with the points
 wiid %>%
   filter(country %in% c("Germany", "France", "Italy", "Spain", "Norway"),
-         year == 2000) %>%
+         year == 2000, !is.na(gini)) %>%
   group_by(country) %>%
   summarize(mean_gini = mean(gini, na.rm = TRUE)) %>%
   ungroup() %>%
   ggplot(aes(x = country, y = mean_gini)) +
   geom_point() +
-  geom_text(aes(label = country), nudge_y = 0.2, size = 3) +
-  labs(x = "", y = "Average Gini Index", title = "Average GINI Index Value Across 5 Countries") +
+  geom_text(aes(label = country), nudge_y = 0.1, size = 3) +
+  labs(
+    x = "", y = "Average Gini Index", title = "Average GINI Index Value Across 5 Countries"
+  ) +
   theme(axis.text.x = element_blank())
 
 ## Q3-b: Density plot of Gini by UN subregion for Africa
@@ -168,19 +167,16 @@ wiid %>%
   geom_density(alpha = 0.25) +
   scale_fill_manual(values = colorRampPalette(c("#1a5276", "#e67e22"))(5)) +
   labs(
-    title = "Income Inequality in Africa",
-    x     = "Gini Index",
-    y     = "Density",
-    fill  = "Subregion"
+    x = "Gini Index", y = "Density", title = "Income Inequality in Africa",
+    fill = "Subregion"
   )
-
-glimpse(wiid)
 
 ## Q3-c: Bar plot of difference from Africa's average Gini per country
 africa_avg <- wiid %>%
   filter(region_un == "Africa", !is.na(gini)) %>%
   summarize(continent_avg = mean(gini, na.rm = TRUE)) %>%
   pull(continent_avg)
+africa_avg
 
 wiid %>%
   filter(region_un == "Africa", !is.na(gini)) %>%
@@ -192,9 +188,7 @@ wiid %>%
   geom_col(fill = "#2e7d8c") +
   coord_flip() +
   labs(
-    title = "Deviation from Africa's Average Gini Index",
-    x     = "",
-    y     = "Difference from Continental Average"
+    x = "", y = "Difference from Continental Average", title = "Deviation from Africa's Average Gini Index"
   )
 
 ## Q3-d: Point plot of mean Gini by country for Europe, flipped and reordered
@@ -207,9 +201,7 @@ wiid %>%
   geom_point() +
   coord_flip() +
   labs(
-    title = "Mean Gini Index by European Country",
-    x     = "",
-    y     = "Mean Gini Index"
+    x = "", y = "Mean Gini Index", title = "Mean Gini Index by European Country"
   ) +
   theme(axis.text.y = element_text(size = 6))
 
@@ -227,9 +219,7 @@ americas_sub %>%
   geom_smooth(aes(group = 1), color = "#d3d3d3", se = FALSE) +
   scale_color_manual(values = c("#e67e22", "#1a5276", "#27ae60", "#8e44ad")) +
   labs(
-    title = "Median Gini Index by Year for Americas Subregions",
-    x     = "Year",
-    y     = "Median Gini Index",
+    x = "Year", y = "Median Gini Index", title = "Median Gini Index by Year for Americas Subregions",
     color = "Subregion"
   )
 
@@ -245,7 +235,5 @@ wiid %>%
   ) +
   stat_summary(fun = median, geom = "point", color = "#c0392b", size = 3) +
   labs(
-    title = "Gini Index by Income Group in Western Asia",
-    x     = "Income Group",
-    y     = "Gini Index"
+    x = "Income Group", y = "Gini Index", title = "Gini Index by Income Group in Western Asia"
   )
